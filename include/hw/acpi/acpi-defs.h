@@ -618,4 +618,115 @@ struct AcpiIortRC {
 } QEMU_PACKED;
 typedef struct AcpiIortRC AcpiIortRC;
 
+// RISC-V 
+
+struct Acpi128 {
+    uint64_t lo;
+    uint64_t hi;
+} QEMU_PACKED;
+typedef struct Acpi128 Acpi128;
+
+/*
+ * RISCV Timer Description Table (RTDT)
+ */
+
+struct AcpiRiscvTimerTable {
+    ACPI_TABLE_HEADER_DEF
+    uint32_t reserved;
+    uint64_t time_base_frequency;
+} QEMU_PACKED;
+typedef struct AcpiRiscvTimerTable AcpiRiscvTimerTable;
+
+union AcpiImsicHartIndex {
+    struct {
+        uint32_t lhxw : 4;
+        uint32_t hhxw : 3;
+        uint32_t lhxs : 3;
+        uint32_t hhxs : 5;
+        uint32_t reserved : 17;
+    };
+    uint32_t hart_index;
+};
+typedef union AcpiImsicHartIndex AcpiImsicHartIndex;
+
+union AcpiRedtHartHwCap {
+    struct {
+        uint32_t mmu_type : 4;
+        uint32_t aia_enabled : 1;
+        uint32_t reserved : 27;
+    };
+    uint32_t hw_cap;
+};
+typedef union AcpiRedtHartHwCap AcpiRedtHartHwCap;
+
+struct AcpiImsicSocket {
+    uint64_t imsic_addr;
+    uint32_t imsic_size;
+    uint32_t reserved;
+} QEMU_PACKED;
+typedef struct AcpiImsicSocket AcpiImsicSocket;
+
+struct AcpiMadtImsic {
+    ACPI_SUB_HEADER_DEF
+    uint8_t  id;
+    uint8_t  version;
+    uint8_t  mode;
+    uint8_t  num_sockets;
+    uint16_t num_interrupt_id;
+    uint16_t ext_irq_num;
+    uint16_t ipi_base;
+    uint16_t ipi_count;
+    uint16_t reserved;
+    uint32_t total_num_harts;
+    uint32_t hart_index;
+    AcpiImsicSocket socket_imsic[];
+} QEMU_PACKED;
+typedef struct AcpiMadtImsic AcpiMadtImsic;
+
+struct AcpiMadtAplic {
+    ACPI_SUB_HEADER_DEF
+    uint8_t   id;
+    uint8_t   version;
+    uint8_t   mode;
+    uint8_t   reserved;
+    uint16_t  global_irq_base;
+    uint16_t  num_interrupts;
+    uint16_t  num_harts;
+    uint32_t  base_cpu_id;
+    uint32_t  hart_index;
+    uint32_t  aplic_size;
+    uint64_t  aplic_addr;
+    AcpiImsicSocket imsic_info;
+} QEMU_PACKED;
+typedef struct AcpiMadtAplic AcpiMadtAplic;
+
+struct AcpiMadtRintc {
+    ACPI_SUB_HEADER_DEF
+    uint8_t        version;
+    uint8_t        aia_csr_enabled;
+    uint32_t       acpi_proc_id;
+    uint32_t       flags;
+    uint32_t       reserved;
+    struct Acpi128 hartId;
+} QEMU_PACKED;
+typedef struct AcpiMadtRintc AcpiMadtRintc;
+
+
+struct AcpiRiscvExtension {
+	uint16_t extension_type;
+	uint16_t attr;
+} QEMU_PACKED;
+typedef struct AcpiRiscvExtension AcpiRiscvExtension;
+
+struct AcpiRedtHartCapInfo {
+	uint16_t length;
+	uint8_t  version;
+	uint8_t  reserved;
+	uint32_t acpi_proc_id;
+	uint32_t isa;
+	uint32_t hart_hwcap;
+//	struct AcpiRiscvExtension extensions[];
+} QEMU_PACKED;
+typedef struct AcpiRedtHartCapInfo AcpiRedtHartCapInfo;
+
 #endif
