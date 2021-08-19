@@ -47,13 +47,18 @@ struct RISCVVirtState {
     /*< public >*/
     RISCVHartArrayState soc[VIRT_SOCKETS_MAX];
     DeviceState *irqchip[VIRT_SOCKETS_MAX];
+    MemMapEntry *memmap;
     PFlashCFI01 *flash[2];
     FWCfgState *fw_cfg;
 
     int fdt_size;
     bool have_aclint;
+    bool have_acpi;
     RISCVVirtAIAType aia_type;
     int aia_guests;
+    PCIBus *bus;
+    char *oem_id;
+    char *oem_table_id;
 };
 
 enum {
@@ -75,7 +80,8 @@ enum {
     VIRT_DRAM,
     VIRT_PCIE_MMIO,
     VIRT_PCIE_PIO,
-    VIRT_PCIE_ECAM
+    VIRT_PCIE_ECAM,
+    VIRT_HIGH_PCIE_MMIO
 };
 
 enum {
@@ -116,4 +122,5 @@ enum {
 #define FDT_APLIC_INT_MAP_WIDTH (FDT_PCI_ADDR_CELLS + FDT_PCI_INT_CELLS + \
                                  1 + FDT_APLIC_INT_CELLS)
 
+void virt_acpi_setup(RISCVVirtState *vms);
 #endif
