@@ -1026,6 +1026,7 @@ void smbios_get_tables(MachineState *ms,
         smbios_build_type_32_table();
         smbios_build_type_38_table();
         smbios_build_type_41_table(errp);
+        smbios_build_type_44_table(ms);
         smbios_build_type_127_table();
 
         smbios_validate_table(ms);

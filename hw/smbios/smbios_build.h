@@ -99,5 +99,6 @@ extern unsigned smbios_table_cnt;
 
 /* IPMI SMBIOS firmware handling */
 void smbios_build_type_38_table(void);
-
+/*RISCV - Table 44 */
+void smbios_build_type_44_table(MachineState *ms);
 #endif /* QEMU_SMBIOS_BUILD_H */

@@ -269,6 +269,44 @@ struct smbios_type_41 {
     uint8_t device_number;
 } QEMU_PACKED;
 
+struct riscv_128 {
+    uint64_t v64_low;
+    uint64_t v64_high;
+} QEMU_PACKED;
+
+struct riscv_processor_specific_data {
+    uint16_t revision;
+    uint8_t  data_length;
+    struct   riscv_128 hartid;
+    uint8_t  boot_hart_id;
+    struct   riscv_128 vendor_id;
+    struct   riscv_128 arch_id;
+    struct   riscv_128 impl_id;
+    uint32_t isa_ext;
+    uint8_t  priv_mode;
+    struct   riscv_128 mmode_excep_deleg;
+    struct   riscv_128 mmode_intr_deleg;
+    uint8_t  xlen;
+    uint8_t  mmode_xlen;
+    uint8_t  reserved;
+    uint8_t  smode_xlen;
+    uint8_t  umode_xlen;
+} QEMU_PACKED;
+
+/* RISC-V Processor Specific Block for Type 44 */
+struct riscv_processor_specific_block {
+    uint8_t  block_length;
+    uint8_t  arch_type;
+    struct   riscv_processor_specific_data psd;
+} QEMU_PACKED;
+
+/* SMBIOS type 44 - Processor Additional Information - RISC-V */
+struct smbios_type_44 {
+    struct   smbios_structure_header header;
+    uint16_t ref_handle;
+    struct   riscv_processor_specific_block psb;
+} QEMU_PACKED;
+
 /* SMBIOS type 127 -- End-of-table */
 struct smbios_type_127 {
     struct smbios_structure_header header;

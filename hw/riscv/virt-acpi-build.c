@@ -285,10 +285,8 @@ build_madt(GArray *table_data, BIOSLinker *linker, RISCVVirtState *vms)
     MachineState *mc = MACHINE(vms);
     int socket;
     AcpiImsicHartIndex imsic_hart_index = {0};
-    //AcpiMadtImsic *imsic_m, *imsic_s;
     AcpiMadtImsic *imsic_s;
     AcpiImsicSocket *imsic_socket;
-//    AcpiMadtAplic *aplic_m, *aplic_s;
     AcpiMadtAplic *aplic_s;
     AcpiMadtRintc *rintc;
     uint16_t node_size = 0, base_hartid;

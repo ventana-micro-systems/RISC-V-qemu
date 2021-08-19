@@ -48,6 +48,7 @@ config RISCV_VIRT
     select SIFIVE_TEST
     select VIRTIO_MMIO
     select FW_CFG_DMA
+    select SMBIOS
     select ACPI_PCI
     select ACPI_HW_REDUCED
     select ACPI_MEMORY_HOTPLUG
