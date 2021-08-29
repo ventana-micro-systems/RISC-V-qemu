@@ -129,6 +129,15 @@ target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
 
     riscv_cpu_set_mode(env, prev_priv);
 
+    /*
+     * QEMU does not promptly deliver guest external interrupts
+     * to a guest running on a hypervisor which in-turn is running
+     * on QEMU. We make dummy call to riscv_cpu_update_mip() upon
+     * every sret instruction so that QEMU pickup guest external
+     * interrupts sooner.
+     */
+     riscv_cpu_update_mip(env_archcpu(env), 0, 0);
+
     return retpc;
 }
 
