@@ -400,6 +400,53 @@ static void build_fadt_rev5(GArray *table_data, BIOSLinker *linker,
     build_fadt(table_data, linker, &fadt, vms->oem_id, vms->oem_table_id);
 }
 
+static void
+build_pptt(GArray *table_data, BIOSLinker *linker, RISCVVirtState *vms)
+{
+    	int pptt_start = table_data->len;
+    	MachineState *ms = MACHINE(vms);
+	int i, socket, acpi_proc_id = 0;
+	RISCVCPU *cpu;
+	uint32_t ppts_priv_rsrc[1];
+	AcpiPpttHartCap hart_caps = {0};
+
+    
+	// Header
+    	acpi_data_push(table_data, sizeof(AcpiTableHeader));
+
+	for (socket = 0; socket < riscv_socket_count(ms); socket++) {
+		uint32_t socket_offset = table_data->len - pptt_start;
+		build_processor_hierarchy_node(
+				table_data,
+				/*
+				 * ACPI 6.2 - Physical package
+				 * represents the boundary of a physical package
+				 */
+				(1 << 0),
+				0, socket, NULL, 0);
+		for (i = 0; i < vms->soc[socket].num_harts; i++) {
+			cpu = &vms->soc[socket].harts[i];
+			uint32_t hart_ppts_start = table_data->len - pptt_start;
+			hart_caps.mmu_type = RISCV_HART_CAP_MMU_TYPE_48;
+			hart_caps.aia_enabled = true;
+			build_processor_properties_node(
+				table_data,
+				cpu->env.misa,
+				hart_caps.hart_cap);
+			ppts_priv_rsrc[0] = hart_ppts_start;
+			build_processor_hierarchy_node(
+				table_data,
+				(1 << 1) | /* ACPI 6.2 - ACPI Processor ID valid */
+				(1 << 3),  /* ACPI 6.3 - Node is a Leaf */
+				socket_offset, acpi_proc_id++, ppts_priv_rsrc, 1);
+		}
+	}
+
+	build_header(linker, table_data, (void *)(table_data->data + pptt_start),
+                 "PPTT", table_data->len - pptt_start, 2, vms->oem_id,
+                 vms->oem_table_id);
+}
+
 /* DSDT */
 static void
 build_dsdt(GArray *table_data, BIOSLinker *linker, RISCVVirtState *vms)
@@ -492,6 +539,8 @@ void virt_acpi_build(RISCVVirtState *vms, AcpiBuildTables *tables)
     acpi_add_table(table_offsets, tables_blob);
     build_rtdt(tables_blob, tables->linker, vms);
 
+    acpi_add_table(table_offsets, tables_blob);
+    build_pptt(tables_blob, tables->linker, vms);
     acpi_add_table(table_offsets, tables_blob);
     {
         AcpiMcfgInfo mcfg = {

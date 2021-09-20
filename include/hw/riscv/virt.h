@@ -62,6 +62,11 @@ struct RISCVVirtState {
 };
 
 enum {
+	RISCV_HART_CAP_MMU_TYPE_39,
+	RISCV_HART_CAP_MMU_TYPE_48
+};
+
+enum {
     VIRT_DEBUG,
     VIRT_MROM,
     VIRT_TEST,

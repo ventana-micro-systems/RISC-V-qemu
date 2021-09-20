@@ -2305,3 +2305,41 @@ Aml *aml_i2c_serial_bus_device(uint16_t address, const char *resource_source)
 
     return var;
 }
+
+/* ACPI 6.2: 5.2.29.1 Processor hierarchy node structure (Type 0) */
+void build_processor_hierarchy_node(GArray *tbl, uint32_t flags,
+		                                 uint32_t parent, uint32_t id,
+		                                 uint32_t *priv_rsrc,
+				 	 	 uint32_t priv_num)
+{
+	int i;
+	
+	build_append_byte(tbl, 0);                 /* Type 0 -  processor */
+	build_append_byte(tbl, 20 + priv_num * 4); /* Length */
+	build_append_int_noprefix(tbl, 0, 2);      /* Reserved */
+	build_append_int_noprefix(tbl, flags, 4);  /* Flags */
+	build_append_int_noprefix(tbl, parent, 4); /* Parent */
+	build_append_int_noprefix(tbl, id, 4);     /* ACPI Processor ID */
+	
+	/* Number of private resources */
+	build_append_int_noprefix(tbl, priv_num, 4);
+	/* Private resources[N] */
+	if (priv_num > 0) {
+		assert(priv_rsrc);
+		for (i = 0; i < priv_num; i++) {
+			 build_append_int_noprefix(tbl,
+						   priv_rsrc[i], 4);
+		}
+	 }
+}
+
+void build_processor_properties_node(GArray *tbl, uint32_t isa,
+		                                 uint64_t cap)
+{
+	build_append_byte(tbl, 2);                 /* Type 2 -  processor properties*/
+	build_append_byte(tbl, 16); /* Length */
+	build_append_int_noprefix(tbl, 1, 2);      /* version */
+	build_append_int_noprefix(tbl, isa, 4);  	/* isa */
+	build_append_int_noprefix(tbl, cap, 8); 	/* capabilities */
+}
+
